@@ -1,6 +1,7 @@
 //For video sources
-const { desktopCapturer, remote, dialog } = require('electron')
+const { desktopCapturer, remote } = require('electron')
 const { Menu } = remote
+const dialog = require('electron').remote.dialog
 const { writeFile } = require('fs')
 
 //Recording
@@ -12,6 +13,19 @@ const videoElement = document.querySelector('video')
 const btnStart = document.getElementById('btnStart')
 const btnStop = document.getElementById('btnStop')
 const btnSelectVideo = document.getElementById('btnSelectVideo')
+
+btnStart.onclick = e => {
+    recorder.start()
+    btnStart.classList.add('is-danger')
+    btnStart.innerText = 'Recording'
+}
+
+btnStop.onclick = e => {
+    recorder.stop()
+    btnStart.classList.remove('is-danger')
+    btnStart.innerText = "Start"
+}
+
 
 btnSelectVideo.onclick = getVideoSourcesThenSelectAndStream
 
@@ -62,7 +76,7 @@ async function selectSource(source){
 
 function handleDataAvailable(e){
     console.log('data available')
-    recordedChunks.push(e,data)
+    recordedChunks.push(e.data)
 }
 
 async function handleStop(e){
@@ -79,5 +93,8 @@ async function handleStop(e){
 
     console.log(filePath)
 
-    writeFile(filePath, buffer, () => console.log('video saved successfully'))
+    if(filePath){
+        writeFile(filePath, buffer, () => console.log('video saved successfully'))
+    }
+        
 }
